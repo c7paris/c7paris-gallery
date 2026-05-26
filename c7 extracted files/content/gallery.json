@@ -1,4 +1,17 @@
 {
-  "profile_image": "",
-  "gallery": []
+  "profile_image": "/images/uploads/photo1.jpg",
+  "gallery": [
+    {
+      "type": "image",
+      "media": "/images/uploads/photo1.jpg"
+    },
+    {
+      "type": "image",
+      "media": "/images/uploads/photo2.jpg"
+    },
+    {
+      "type": "image",
+      "media": "/images/uploads/photo3.jpg"
+    }
+  ]
 }
