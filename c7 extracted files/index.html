@@ -129,17 +129,13 @@ items.forEach(function (media) {
 
     loadGallery();
   </script>
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script>
   if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", function (user) {
-      if (!user && window.location.hash) {
+    window.netlifyIdentity.on("init", function () {
+      if (window.location.hash.includes("invite_token") || window.location.hash.includes("recovery_token")) {
         window.netlifyIdentity.open();
       }
-    });
-
-    window.netlifyIdentity.on("login", function () {
-      window.location.href = "/admin/";
     });
   }
 </script>
