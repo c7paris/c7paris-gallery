@@ -18,21 +18,10 @@ collections:
             widget: "image"
             required: false
 
-          - label: "Gallery items"
+          - label: "Gallery images"
             name: "gallery"
-            widget: "list"
+            widget: "image"
+            media_library:
+              config:
+                multiple: true
             required: false
-            summary: "{{fields.type}} - {{fields.media}}"
-            fields:
-              - label: "Type"
-                name: "type"
-                widget: "select"
-                options:
-                  - { label: "Image", value: "image" }
-                  - { label: "Video", value: "video" }
-                default: "image"
-
-              - label: "Media file"
-                name: "media"
-                widget: "file"
-                required: true
