@@ -92,43 +92,70 @@
   </main>
 
   <script>
-    async function loadGallery() {
-      try {
-        const response = await fetch("/content/gallery.json", { cache: "no-store" });
-        const data = await response.json();
+  const githubApiUrl =
+    "https://api.github.com/repos/c7paris/c7paris-gallery/contents/c7%20extracted%20files/images/uploads?ref=main";
 
-        const profileImage = document.getElementById("profileImage");
-        const galleryGrid = document.getElementById("galleryGrid");
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".avif"];
+  const videoExtensions = [".mp4", ".webm", ".mov"];
 
-        if (data.profile_image) {
-          profileImage.src = data.profile_image;
-          profileImage.style.display = "block";
+  function getFileExtension(filename) {
+    return filename.toLowerCase().slice(filename.lastIndexOf("."));
+  }
+
+  async function loadGallery() {
+    const profileImage = document.getElementById("profileImage");
+    const galleryGrid = document.getElementById("galleryGrid");
+
+    try {
+      const response = await fetch(githubApiUrl, { cache: "no-store" });
+      const files = await response.json();
+
+      const mediaFiles = files.filter(function (file) {
+        if (file.type !== "file") return false;
+
+        const extension = getFileExtension(file.name);
+
+        return (
+          imageExtensions.includes(extension) ||
+          videoExtensions.includes(extension)
+        );
+      });
+
+      galleryGrid.innerHTML = "";
+
+      if (mediaFiles.length > 0) {
+        profileImage.src = mediaFiles[0].download_url;
+        profileImage.style.display = "block";
+      }
+
+      mediaFiles.forEach(function (file) {
+        const extension = getFileExtension(file.name);
+
+        const tile = document.createElement("div");
+        tile.className = "tile";
+
+        if (videoExtensions.includes(extension)) {
+          const video = document.createElement("video");
+          video.src = file.download_url;
+          video.controls = true;
+          video.playsInline = true;
+          tile.appendChild(video);
+        } else {
+          const img = document.createElement("img");
+          img.src = file.download_url;
+          img.alt = "";
+          tile.appendChild(img);
         }
 
-        galleryGrid.innerHTML = "";
-
-        const items = Array.isArray(data.gallery) ? data.gallery : [];
-
-items.forEach(function (media) {
-  if (!media) return;
-
-  const tile = document.createElement("div");
-  tile.className = "tile";
-
-  const img = document.createElement("img");
-  img.src = media;
-  img.alt = "";
-
-  tile.appendChild(img);
-  galleryGrid.appendChild(tile);
-});
-      } catch (error) {
-        console.error("Could not load gallery.json", error);
-      }
+        galleryGrid.appendChild(tile);
+      });
+    } catch (error) {
+      console.error("Could not load uploaded files", error);
     }
+  }
 
-    loadGallery();
-  </script>
+  loadGallery();
+</script>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script>
   if (window.netlifyIdentity) {
