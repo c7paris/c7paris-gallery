@@ -109,27 +109,19 @@
 
         const items = Array.isArray(data.gallery) ? data.gallery : [];
 
-        items.forEach(function (item) {
-          if (!item.media) return;
+items.forEach(function (media) {
+  if (!media) return;
 
-          const tile = document.createElement("div");
-          tile.className = "tile";
+  const tile = document.createElement("div");
+  tile.className = "tile";
 
-          if (item.type === "video") {
-            const video = document.createElement("video");
-            video.src = item.media;
-            video.controls = true;
-            video.playsInline = true;
-            tile.appendChild(video);
-          } else {
-            const img = document.createElement("img");
-            img.src = item.media;
-            img.alt = "";
-            tile.appendChild(img);
-          }
+  const img = document.createElement("img");
+  img.src = media;
+  img.alt = "";
 
-          galleryGrid.appendChild(tile);
-        });
+  tile.appendChild(img);
+  galleryGrid.appendChild(tile);
+});
       } catch (error) {
         console.error("Could not load gallery.json", error);
       }
