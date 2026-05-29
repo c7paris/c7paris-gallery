@@ -123,12 +123,14 @@
 
       galleryGrid.innerHTML = "";
 
-      if (mediaFiles.length > 0) {
-        profileImage.src = mediaFiles[0].download_url;
-        profileImage.style.display = "block";
-      }
+if (mediaFiles.length > 0) {
+  profileImage.src = mediaFiles[0].download_url;
+  profileImage.style.display = "block";
+}
 
-      mediaFiles.forEach(function (file) {
+const galleryFiles = mediaFiles.slice(1);
+
+galleryFiles.forEach(function (file) {
         const extension = getFileExtension(file.name);
 
         const tile = document.createElement("div");
