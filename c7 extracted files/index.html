@@ -113,6 +113,7 @@
 <nav class="tabs">
   <button class="tab active" data-tab="photos">Photos</button>
   <button class="tab" data-tab="videos">Videos</button>
+  <button class="tab" data-tab="posters">Posters</button>
 </nav>
 
 <section id="galleryGrid" class="grid"></section>
@@ -125,9 +126,10 @@
   const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".avif"];
   const videoExtensions = [".mp4", ".webm", ".mov"];
 
-  let photos = [];
-  let videos = [];
-  let currentTab = "photos";
+let photos = [];
+let videos = [];
+let posters = [];
+let currentTab = "photos";
 
   function getFileExtension(filename) {
     return filename.toLowerCase().slice(filename.lastIndexOf("."));
@@ -179,7 +181,13 @@
       button.classList.toggle("active", button.dataset.tab === tabName);
     });
 
-    renderGallery(tabName === "videos" ? videos : photos);
+    if (tabName === "videos") {
+  renderGallery(videos);
+} else if (tabName === "posters") {
+  renderGallery(posters);
+} else {
+  renderGallery(photos);
+}
   }
 
   async function loadGallery() {
@@ -214,17 +222,25 @@
 
       const galleryFiles = mediaFiles.slice(1);
 
-      photos = shuffle(
-        galleryFiles.filter(function (file) {
-          return imageExtensions.includes(getFileExtension(file.name));
-        })
-      );
+     posters = shuffle(
+  galleryFiles.filter(function (file) {
+    const extension = getFileExtension(file.name);
+    return imageExtensions.includes(extension) && file.name.toLowerCase().includes("poster");
+  })
+);
 
-      videos = shuffle(
-        galleryFiles.filter(function (file) {
-          return videoExtensions.includes(getFileExtension(file.name));
-        })
-      );
+photos = shuffle(
+  galleryFiles.filter(function (file) {
+    const extension = getFileExtension(file.name);
+    return imageExtensions.includes(extension) && !file.name.toLowerCase().includes("poster");
+  })
+);
+
+videos = shuffle(
+  galleryFiles.filter(function (file) {
+    return videoExtensions.includes(getFileExtension(file.name));
+  })
+);
 
       setActiveTab(currentTab);
     } catch (error) {
