@@ -278,7 +278,13 @@
       const audio = document.createElement("audio");
       audio.src = file.download_url;
       audio.controls = true;
-
+      audio.addEventListener("play", function () {
+  document.querySelectorAll("audio").forEach(function (otherAudio) {
+    if (otherAudio !== audio) {
+      otherAudio.pause();
+    }
+  });
+});
       left.appendChild(title);
       left.appendChild(audio);
 
