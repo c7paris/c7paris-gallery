@@ -108,6 +108,37 @@
 .tab.active {
   color: #000;
 }
+    .track-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.track-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.track-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.track-item audio {
+  width: 100%;
+}
+
+.download-link {
+  color: #000;
+  font-size: 22px;
+  line-height: 1;
+  text-decoration: none;
+}
     @media (max-width: 600px) {
       .header {
         padding: 32px 0;
@@ -136,6 +167,7 @@
   <button class="tab active" data-tab="photos">Photos</button>
   <button class="tab" data-tab="videos">Videos</button>
   <button class="tab" data-tab="posters">Posters</button>
+  <button class="tab" data-tab="tracks">Free tracks</button>
 </nav>
 
 <p id="posterCredit" class="credit poster-credit">
@@ -151,11 +183,13 @@
 
   const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".avif"];
   const videoExtensions = [".mp4", ".webm", ".mov"];
+  const audioExtensions = [".wav"];
 
-let photos = [];
-let videos = [];
-let posters = [];
-let currentTab = "photos";
+  let photos = [];
+  let videos = [];
+  let posters = [];
+  let tracks = [];
+  let currentTab = "photos";
 
   function getFileExtension(filename) {
     return filename.toLowerCase().slice(filename.lastIndexOf("."));
@@ -172,9 +206,18 @@ let currentTab = "photos";
     return shuffled;
   }
 
+  function formatTrackTitle(filename) {
+    return filename
+      .replace(/\.[^/.]+$/, "")
+      .replace(/^track-\d+-?/i, "")
+      .replace(/[-_]/g, " ")
+      .trim();
+  }
+
   function renderGallery(items) {
     const galleryGrid = document.getElementById("galleryGrid");
 
+    galleryGrid.className = "grid";
     galleryGrid.innerHTML = "";
 
     items.forEach(function (file) {
@@ -200,27 +243,66 @@ let currentTab = "photos";
     });
   }
 
-function setActiveTab(tabName) {
-  currentTab = tabName;
+  function renderTracks(items) {
+    const galleryGrid = document.getElementById("galleryGrid");
 
-  document.querySelectorAll(".tab").forEach(function (button) {
-    button.classList.toggle("active", button.dataset.tab === tabName);
-  });
+    galleryGrid.className = "track-list";
+    galleryGrid.innerHTML = "";
 
-  const posterCredit = document.getElementById("posterCredit");
+    items.forEach(function (file) {
+      const trackItem = document.createElement("div");
+      trackItem.className = "track-item";
 
-  if (posterCredit) {
-    posterCredit.style.display = tabName === "posters" ? "block" : "none";
+      const left = document.createElement("div");
+
+      const title = document.createElement("p");
+      title.className = "track-title";
+      title.textContent = formatTrackTitle(file.name) || file.name;
+
+      const audio = document.createElement("audio");
+      audio.src = file.download_url;
+      audio.controls = true;
+
+      left.appendChild(title);
+      left.appendChild(audio);
+
+      const download = document.createElement("a");
+      download.className = "download-link";
+      download.href = file.download_url;
+      download.download = file.name;
+      download.textContent = "↓";
+      download.setAttribute("aria-label", "Download " + file.name);
+
+      trackItem.appendChild(left);
+      trackItem.appendChild(download);
+
+      galleryGrid.appendChild(trackItem);
+    });
   }
 
-  if (tabName === "videos") {
-    renderGallery(videos);
-  } else if (tabName === "posters") {
-    renderGallery(posters);
-  } else {
-    renderGallery(photos);
+  function setActiveTab(tabName) {
+    currentTab = tabName;
+
+    document.querySelectorAll(".tab").forEach(function (button) {
+      button.classList.toggle("active", button.dataset.tab === tabName);
+    });
+
+    const posterCredit = document.getElementById("posterCredit");
+
+    if (posterCredit) {
+      posterCredit.style.display = tabName === "posters" ? "block" : "none";
+    }
+
+    if (tabName === "videos") {
+      renderGallery(videos);
+    } else if (tabName === "posters") {
+      renderGallery(posters);
+    } else if (tabName === "tracks") {
+      renderTracks(tracks);
+    } else {
+      renderGallery(photos);
+    }
   }
-}
 
   async function loadGallery() {
     const profileImage = document.getElementById("profileImage");
@@ -237,7 +319,8 @@ function setActiveTab(tabName) {
 
           return (
             imageExtensions.includes(extension) ||
-            videoExtensions.includes(extension)
+            videoExtensions.includes(extension) ||
+            audioExtensions.includes(extension)
           );
         })
         .sort(function (a, b) {
@@ -254,25 +337,29 @@ function setActiveTab(tabName) {
 
       const galleryFiles = mediaFiles.slice(1);
 
-     posters = shuffle(
-  galleryFiles.filter(function (file) {
-    const extension = getFileExtension(file.name);
-    return imageExtensions.includes(extension) && file.name.toLowerCase().includes("poster");
-  })
-);
+      posters = shuffle(
+        galleryFiles.filter(function (file) {
+          const extension = getFileExtension(file.name);
+          return imageExtensions.includes(extension) && file.name.toLowerCase().includes("poster");
+        })
+      );
 
-photos = shuffle(
-  galleryFiles.filter(function (file) {
-    const extension = getFileExtension(file.name);
-    return imageExtensions.includes(extension) && !file.name.toLowerCase().includes("poster");
-  })
-);
+      photos = shuffle(
+        galleryFiles.filter(function (file) {
+          const extension = getFileExtension(file.name);
+          return imageExtensions.includes(extension) && !file.name.toLowerCase().includes("poster");
+        })
+      );
 
-videos = shuffle(
-  galleryFiles.filter(function (file) {
-    return videoExtensions.includes(getFileExtension(file.name));
-  })
-);
+      videos = shuffle(
+        galleryFiles.filter(function (file) {
+          return videoExtensions.includes(getFileExtension(file.name));
+        })
+      );
+
+      tracks = galleryFiles.filter(function (file) {
+        return audioExtensions.includes(getFileExtension(file.name));
+      });
 
       setActiveTab(currentTab);
     } catch (error) {
@@ -288,6 +375,7 @@ videos = shuffle(
 
   loadGallery();
 </script>
+
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <script>
   if (window.netlifyIdentity) {
