@@ -143,9 +143,13 @@
 
 .download-link {
   color: #000;
-  font-size: 22px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   line-height: 1;
   text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
     @media (max-width: 600px) {
       .header {
@@ -282,7 +286,7 @@
       download.className = "download-link";
       download.href = file.download_url;
       download.download = file.name;
-      download.textContent = "↓";
+      download.textContent = "Download WAV";
       download.setAttribute("aria-label", "Download " + file.name);
 
       trackItem.appendChild(left);
