@@ -293,10 +293,9 @@ function renderTracks(items) {
 
     const download = document.createElement("a");
     download.className = "download-link";
-    download.href = track.downloadUrl;
-    download.target = "_blank";
-    download.rel = "noopener";
-    download.textContent = "Download WAV";
+   download.href = track.downloadUrl;
+download.download = (track.title || "C7 Track") + ".wav";
+download.textContent = "Download WAV";
     download.setAttribute("aria-label", "Download WAV for " + (track.title || "track"));
 
     trackItem.appendChild(left);
