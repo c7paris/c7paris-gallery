@@ -259,48 +259,52 @@
     });
   }
 
-  function renderTracks(items) {
-    const galleryGrid = document.getElementById("galleryGrid");
+function renderTracks(items) {
+  const galleryGrid = document.getElementById("galleryGrid");
 
-    galleryGrid.className = "track-list";
-    galleryGrid.innerHTML = "";
+  galleryGrid.className = "track-list";
+  galleryGrid.innerHTML = "";
 
-    items.forEach(function (file) {
-      const trackItem = document.createElement("div");
-      trackItem.className = "track-item";
+  items.forEach(function (track) {
+    const trackItem = document.createElement("div");
+    trackItem.className = "track-item";
 
-      const left = document.createElement("div");
+    const left = document.createElement("div");
 
-      const title = document.createElement("p");
-      title.className = "track-title";
-      title.textContent = formatTrackTitle(file.name) || file.name;
+    const title = document.createElement("p");
+    title.className = "track-title";
+    title.textContent = track.title || "Untitled track";
 
-      const audio = document.createElement("audio");
-      audio.src = file.download_url;
-      audio.controls = true;
-      audio.addEventListener("play", function () {
-  document.querySelectorAll("audio").forEach(function (otherAudio) {
-    if (otherAudio !== audio) {
-      otherAudio.pause();
-    }
-  });
-});
-      left.appendChild(title);
-      left.appendChild(audio);
+    const audio = document.createElement("audio");
+    audio.src = track.previewUrl;
+    audio.controls = true;
+    audio.preload = "none";
 
-      const download = document.createElement("a");
-      download.className = "download-link";
-      download.href = file.download_url;
-      download.download = file.name;
-      download.textContent = "Download WAV";
-      download.setAttribute("aria-label", "Download " + file.name);
-
-      trackItem.appendChild(left);
-      trackItem.appendChild(download);
-
-      galleryGrid.appendChild(trackItem);
+    audio.addEventListener("play", function () {
+      document.querySelectorAll("audio").forEach(function (otherAudio) {
+        if (otherAudio !== audio) {
+          otherAudio.pause();
+        }
+      });
     });
-  }
+
+    left.appendChild(title);
+    left.appendChild(audio);
+
+    const download = document.createElement("a");
+    download.className = "download-link";
+    download.href = track.downloadUrl;
+    download.target = "_blank";
+    download.rel = "noopener";
+    download.textContent = "Download WAV";
+    download.setAttribute("aria-label", "Download WAV for " + (track.title || "track"));
+
+    trackItem.appendChild(left);
+    trackItem.appendChild(download);
+
+    galleryGrid.appendChild(trackItem);
+  });
+}
 
   function setActiveTab(tabName) {
     currentTab = tabName;
@@ -384,9 +388,21 @@ if (tracksIntro) {
         })
       );
 
-      tracks = galleryFiles.filter(function (file) {
-        return audioExtensions.includes(getFileExtension(file.name));
-      });
+     try {
+  const tracksResponse = await fetch("/content/tracks.json", { cache: "no-store" });
+  const trackData = await tracksResponse.json();
+
+  tracks = trackData.map(function (track) {
+    return {
+      title: track.title,
+      previewUrl: "images/uploads/" + track.previewFile,
+      downloadUrl: track.downloadUrl
+    };
+  });
+} catch (error) {
+  console.error("Could not load tracks.json", error);
+  tracks = [];
+}
 
       setActiveTab(currentTab);
     } catch (error) {
