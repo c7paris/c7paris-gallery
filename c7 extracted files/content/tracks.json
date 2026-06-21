@@ -1,2 +1,12 @@
-https://files.catbox.moe/67w9g2.wav
-https://files.catbox.moe/acduq6.wav
+[
+  {
+    "title": "Club Tool 01",
+    "previewFile": "C7_ClubTool_01_demo_v0.mp3",
+    "downloadUrl": "https://files.catbox.moe/67w9g2.wav"
+  },
+  {
+    "title": "Club Tool 02",
+    "previewFile": "C7_ClubTool_02_demo_v0.mp3",
+    "downloadUrl": "https://files.catbox.moe/acduq6.wav"
+  }
+]
