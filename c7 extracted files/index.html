@@ -201,12 +201,15 @@
   const videoExtensions = [".mp4", ".webm", ".mov"];
   const audioExtensions = [".mp3", ".wav"];
 
-  let photos = [];
-  let videos = [];
-  let posters = [];
-  let tracks = [];
-  let currentTab = "photos";
+let photos = [];
+let videos = [];
+let posters = [];
+let tracks = [];
+let currentTab = window.location.hash ? window.location.hash.replace("#", "") : "photos";
 
+if (!["photos", "videos", "posters", "tracks"].includes(currentTab)) {
+  currentTab = "photos";
+}
   function getFileExtension(filename) {
     return filename.toLowerCase().slice(filename.lastIndexOf("."));
   }
@@ -307,7 +310,9 @@ download.textContent = "Download WAV";
 
   function setActiveTab(tabName) {
     currentTab = tabName;
-
+if (window.location.hash !== "#" + tabName) {
+  history.pushState(null, "", "#" + tabName);
+}
     document.querySelectorAll(".tab").forEach(function (button) {
       button.classList.toggle("active", button.dataset.tab === tabName);
     });
@@ -414,7 +419,13 @@ if (tracksIntro) {
       setActiveTab(button.dataset.tab);
     });
   });
+window.addEventListener("popstate", function () {
+  const tabFromUrl = window.location.hash ? window.location.hash.replace("#", "") : "photos";
 
+  if (["photos", "videos", "posters", "tracks"].includes(tabFromUrl)) {
+    setActiveTab(tabFromUrl);
+  }
+});
   loadGallery();
 </script>
 
